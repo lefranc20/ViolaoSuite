@@ -1,5 +1,8 @@
 package com.example.violao_suite
 
+// import androidx.compose.material3.*
+import androidx.compose.material.*
+
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.sp // Import para definir o tamanho da fonte
 import androidx.compose.foundation.Image
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.violao_suite.R
 
 class MainActivity : ComponentActivity() {
@@ -43,32 +46,40 @@ fun MyApp() {
 }
 
 @Composable
+fun currentRoute(navController: NavHostController): String? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.destination?.route
+}
+
+
+@Composable
 fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf("acordes", "tablaturas", "metronomo", "afinador")
+    val items = listOf("tablaturas", "acordes", "metronomo", "afinador")
+    val currentRoute = currentRoute(navController)
     BottomNavigation {
         items.forEach { screen ->
             BottomNavigationItem(
                 icon = {
                     when (screen) {
-                        "acordes" -> Image(
-                            painter = painterResource(id = R.drawable.ic_acordes), // Substitua pelo ID da sua imagem
-                            contentDescription = "Acordes",
-                            modifier = Modifier
-                                .size(20.dp) // Tamanho do ícone
-                                .align(Alignment.CenterVertically) // Centraliza verticalmente
-                        )
                         "tablaturas" -> Image(
                             painter = painterResource(id = R.drawable.ic_tablaturas), // Substitua pelo ID da sua imagem
                             contentDescription = "Tablaturas",
                             modifier = Modifier
-                                .size(20.dp) // Tamanho do ícone
+                                .size(30.dp) // Tamanho do ícone
+                                .align(Alignment.CenterVertically) // Centraliza verticalmente
+                        )
+                        "acordes" -> Image(
+                            painter = painterResource(id = R.drawable.ic_acordes), // Substitua pelo ID da sua imagem
+                            contentDescription = "Acordes",
+                            modifier = Modifier
+                                .size(24.dp) // Tamanho do ícone
                                 .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "metronomo" -> Image(
                             painter = painterResource(id = R.drawable.ic_metronomo), // Substitua pelo ID da sua imagem
                             contentDescription = "Metrônomo",
                             modifier = Modifier
-                                .size(20.dp) // Tamanho do ícone
+                                .size(26.dp) // Tamanho do ícone
                                 .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "afinador" -> Image(
@@ -80,10 +91,21 @@ fun BottomNavigationBar(navController: NavHostController) {
                         )
                     }
                 },
-                label = { Text(screen.capitalize()) },
-                selected = false, // Aqui você pode adicionar lógica para definir o estado de seleção
+                label = {
+                    Text(
+                        text = screen.replaceFirstChar { it.uppercase() },
+                        fontSize = 11.sp, // Altere o tamanho da fonte conforme necessário
+                    )
+                },
+                selected = currentRoute == screen,
                 onClick = {
-                    navController.navigate(screen)
+                    navController.navigate(screen) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
