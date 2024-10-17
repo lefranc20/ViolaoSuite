@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,6 +15,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.unit.sp // Import para definir o tamanho da fonte
+import androidx.compose.foundation.Image
 import com.example.violao_suite.R
 
 class MainActivity : ComponentActivity() {
@@ -46,19 +52,31 @@ fun BottomNavigationBar(navController: NavHostController) {
                     when (screen) {
                         "acordes" -> Image(
                             painter = painterResource(id = R.drawable.ic_acordes), // Substitua pelo ID da sua imagem
-                            contentDescription = "Acordes"
+                            contentDescription = "Acordes",
+                            modifier = Modifier
+                                .size(20.dp) // Tamanho do ícone
+                                .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "tablaturas" -> Image(
                             painter = painterResource(id = R.drawable.ic_tablaturas), // Substitua pelo ID da sua imagem
-                            contentDescription = "Tablaturas"
+                            contentDescription = "Tablaturas",
+                            modifier = Modifier
+                                .size(20.dp) // Tamanho do ícone
+                                .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "metronomo" -> Image(
                             painter = painterResource(id = R.drawable.ic_metronomo), // Substitua pelo ID da sua imagem
-                            contentDescription = "Metrônomo"
+                            contentDescription = "Metrônomo",
+                            modifier = Modifier
+                                .size(20.dp) // Tamanho do ícone
+                                .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "afinador" -> Image(
                             painter = painterResource(id = R.drawable.ic_afinador), // Substitua pelo ID da sua imagem
-                            contentDescription = "Afinador"
+                            contentDescription = "Afinador",
+                            modifier = Modifier
+                                .size(20.dp) // Tamanho do ícone
+                                .align(Alignment.CenterVertically) // Centraliza verticalmentes
                         )
                     }
                 },
