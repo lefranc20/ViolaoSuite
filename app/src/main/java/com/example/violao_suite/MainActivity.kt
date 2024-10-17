@@ -1,79 +1,103 @@
 package com.example.violao_suite
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.example.violao_suite.ui.theme.ViolaoSuiteTheme
+import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.violao_suite.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ViolaoSuiteTheme {
-                ScaffoldExample()
-            }
+            MyApp()
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ScaffoldExample() {
-    var presses by remember { mutableIntStateOf(0) }
-
+fun MyApp() {
+    val navController = rememberNavController()
     Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("Barra superior do app")
+        bottomBar = { BottomNavigationBar(navController) }
+    ) {
+        NavigationHost(navController)
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    val items = listOf("acordes", "tablaturas", "metronomo", "afinador")
+    BottomNavigation {
+        items.forEach { screen ->
+            BottomNavigationItem(
+                icon = {
+                    when (screen) {
+                        "acordes" -> Image(
+                            painter = painterResource(id = R.drawable.ic_acordes), // Substitua pelo ID da sua imagem
+                            contentDescription = "Acordes"
+                        )
+                        "tablaturas" -> Image(
+                            painter = painterResource(id = R.drawable.ic_tablaturas), // Substitua pelo ID da sua imagem
+                            contentDescription = "Tablaturas"
+                        )
+                        "metronomo" -> Image(
+                            painter = painterResource(id = R.drawable.ic_metronomo), // Substitua pelo ID da sua imagem
+                            contentDescription = "Metrônomo"
+                        )
+                        "afinador" -> Image(
+                            painter = painterResource(id = R.drawable.ic_afinador), // Substitua pelo ID da sua imagem
+                            contentDescription = "Afinador"
+                        )
+                    }
+                },
+                label = { Text(screen.capitalize()) },
+                selected = false, // Aqui você pode adicionar lógica para definir o estado de seleção
+                onClick = {
+                    navController.navigate(screen)
                 }
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Barra inferior do app",
-                )
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = """
-                            Este é um exemplo de um scaffold. Ele usa os parâmetros do composable Scaffold para criar uma tela com uma barra superior simples, uma barra inferior e um botão de ação flutuante.
-                            
-                            Ele também contém algum conteúdo básico, como este texto.
-                            
-                            Você pressionou o botão de ação flutuante $presses vezes.
-                """.trimIndent(),
             )
         }
     }
+}
+
+@Composable
+fun NavigationHost(navController: NavHostController) {
+    NavHost(navController, startDestination = "acordes") {
+        composable("acordes") { AcordesScreen() }
+        composable("tablaturas") { TablaturasScreen() }
+        composable("metronomo") { MetronomoScreen() }
+        composable("afinador") { AfinadorScreen() }
+    }
+}
+
+@Composable
+fun AcordesScreen() {
+    Text(text = "Tela de Acordes", modifier = Modifier.fillMaxSize())
+}
+
+@Composable
+fun TablaturasScreen() {
+    Text(text = "Tela de Tablaturas", modifier = Modifier.fillMaxSize())
+}
+
+@Composable
+fun MetronomoScreen() {
+    Text(text = "Tela de Metrônomo", modifier = Modifier.fillMaxSize())
+}
+
+@Composable
+fun AfinadorScreen() {
+    Text(text = "Tela de Afinador", modifier = Modifier.fillMaxSize())
 }
