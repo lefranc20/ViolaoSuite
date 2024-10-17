@@ -65,29 +65,30 @@ fun BottomNavigationBar(navController: NavHostController) {
                             painter = painterResource(id = R.drawable.ic_tablaturas), // Substitua pelo ID da sua imagem
                             contentDescription = "Tablaturas",
                             modifier = Modifier
-                                .size(30.dp) // Tamanho do ícone
+                                .size(32.dp) // Tamanho do ícone
                                 .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "acordes" -> Image(
                             painter = painterResource(id = R.drawable.ic_acordes), // Substitua pelo ID da sua imagem
                             contentDescription = "Acordes",
                             modifier = Modifier
-                                .size(24.dp) // Tamanho do ícone
+                                .size(32.dp) // Tamanho do ícone
                                 .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "metronomo" -> Image(
                             painter = painterResource(id = R.drawable.ic_metronomo), // Substitua pelo ID da sua imagem
-                            contentDescription = "Metrônomo",
+                            contentDescription = "Metronomo",
                             modifier = Modifier
-                                .size(26.dp) // Tamanho do ícone
+                                .size(32.dp) // Tamanho do ícone
                                 .align(Alignment.CenterVertically) // Centraliza verticalmente
                         )
                         "afinador" -> Image(
                             painter = painterResource(id = R.drawable.ic_afinador), // Substitua pelo ID da sua imagem
                             contentDescription = "Afinador",
                             modifier = Modifier
-                                .size(20.dp) // Tamanho do ícone
+                                .size(32.dp) // Tamanho do ícone
                                 .align(Alignment.CenterVertically) // Centraliza verticalmentes
+                                ,
                         )
                     }
                 },
