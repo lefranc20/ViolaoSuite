@@ -1,6 +1,7 @@
 package com.example.violao_suite
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.*
@@ -20,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.violao_suite.ui.theme.ViolaoSuiteTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,29 +54,38 @@ fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf("tablaturas", "acordes", "metronomo", "afinador")
     val currentRoute = currentRoute(navController)
     BottomNavigation(
-        backgroundColor = Color(0xFF141218), // Cor de fundo da barra de navegação inferior
+        backgroundColor = Color(0xFF141218),
     ) {
         items.forEach { screen ->
+            val isSelected = currentRoute == screen
             BottomNavigationItem(
                 icon = {
                     when (screen) {
                         "tablaturas" -> Image(
-                            painter = painterResource(id = R.drawable.ic_tablaturas),
+                            painter = painterResource(
+                                id = if (isSelected) R.drawable.ic_tablaturas_selecionado else R.drawable.ic_tablaturas
+                            ),
                             contentDescription = "Tablaturas",
                             modifier = Modifier.size(32.dp)
                         )
                         "acordes" -> Image(
-                            painter = painterResource(id = R.drawable.ic_acordes),
+                            painter = painterResource(
+                                id = if (isSelected) R.drawable.ic_acordes_selecionado else R.drawable.ic_acordes
+                            ),
                             contentDescription = "Acordes",
                             modifier = Modifier.size(32.dp)
                         )
                         "metronomo" -> Image(
-                            painter = painterResource(id = R.drawable.ic_metronomo),
+                            painter = painterResource(
+                                id = if (isSelected) R.drawable.ic_metronomo_selecionado else R.drawable.ic_metronomo
+                            ),
                             contentDescription = "Metronomo",
                             modifier = Modifier.size(32.dp)
                         )
                         "afinador" -> Image(
-                            painter = painterResource(id = R.drawable.ic_afinador),
+                            painter = painterResource(
+                                id = if (isSelected) R.drawable.ic_afinador_selecionado else R.drawable.ic_afinador
+                            ),
                             contentDescription = "Afinador",
                             modifier = Modifier.size(32.dp)
                         )
@@ -86,16 +97,21 @@ fun BottomNavigationBar(navController: NavHostController) {
                         fontSize = 11.sp,
                     )
                 },
-                selected = currentRoute == screen,
-                selectedContentColor = Color(0xFFD0BCFE), // Cor quando o item está selecionado
-                unselectedContentColor = Color(0xFFCAC4D0), // Cor quando o item não está selecionado
+                selected = isSelected,
+                selectedContentColor = Color(0xFFD0BCFE),
+                unselectedContentColor = Color(0xFFCAC4D0),
                 onClick = {
-                    navController.navigate(screen) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                    if (screen == "acordes" && currentRoute == "acorde_detalhe") {
+                        // Se já estiver no acorde detalhado, voltar para a lista de acordes
+                        navController.popBackStack("acordes", inclusive = false)
+                    } else {
+                        navController.navigate(screen) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
                 }
             )
@@ -106,18 +122,21 @@ fun BottomNavigationBar(navController: NavHostController) {
 @Composable
 fun NavigationHost(navController: NavHostController) {
     NavHost(navController, startDestination = "acordes") {
-        composable("acordes") { AcordesScreen() }
+        composable("acordes") { AcordesScreen(navController) }
+        composable("acorde_detalhe/{acorde}") { backStackEntry ->
+            val acorde = backStackEntry.arguments?.getString("acorde")
+            AcordeDetalheScreen(acorde)
+        }
         composable("tablaturas") { TablaturasScreen() }
         composable("metronomo") { MetronomoScreen() }
         composable("afinador") { AfinadorScreen() }
     }
 }
 
-// Exibição da lista de acordes em uma grade
 @Composable
-fun AcordesScreen() {
+fun AcordesScreen(navController: NavHostController) {
     val acordes = listOf(
-        Pair("A menor", R.drawable.img_am), // Substitua pelos IDs das suas imagens
+        Pair("A menor", R.drawable.img_am),
         Pair("Em", R.drawable.img_em),
         Pair("C maior", R.drawable.img_c),
         Pair("D maior", R.drawable.img_d),
@@ -133,14 +152,18 @@ fun AcordesScreen() {
         )
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3), // Define 3 colunas
+            columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items(acordes) { acorde ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            navController.navigate("acorde_detalhe/${acorde.first}")
+                        }
                 ) {
                     Image(
                         painter = painterResource(id = acorde.second),
@@ -154,6 +177,34 @@ fun AcordesScreen() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AcordeDetalheScreen(acorde: String?) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = when (acorde) {
+                "A menor" -> R.drawable.img_am
+                "Em" -> R.drawable.img_em
+                "C maior" -> R.drawable.img_c
+                "D maior" -> R.drawable.img_d
+                "D7" -> R.drawable.img_d7
+                "D menor" -> R.drawable.img_dm
+                else -> R.drawable.ic_launcher_foreground // Fallback para evitar crashes
+            }),
+            contentDescription = acorde,
+            modifier = Modifier.size(256.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = acorde ?: "Acorde Desconhecido",
+            fontSize = 24.sp
+        )
     }
 }
 

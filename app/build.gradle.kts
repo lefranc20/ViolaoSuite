@@ -64,6 +64,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation ("androidx.navigation:navigation-compose:2.7.1") // Certifique-se de estar usando a última versão
+
 
     // Dependência para navegação com Compose
     implementation("androidx.navigation:navigation-compose:2.5.3")
