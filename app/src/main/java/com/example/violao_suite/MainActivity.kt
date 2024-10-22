@@ -21,6 +21,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+
+
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
+import android.media.MediaPlayer
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 import com.example.violao_suite.ui.theme.ViolaoSuiteTheme
 
 class MainActivity : ComponentActivity() {
@@ -128,7 +141,10 @@ fun NavigationHost(navController: NavHostController) {
             AcordeDetalheScreen(acorde)
         }
         composable("tablaturas") { TablaturasScreen() }
-        composable("metronomo") { MetronomoScreen() }
+        composable("metronomo") {
+            val context = LocalContext.current
+            MetronomoScreen(context)
+        }
         composable("afinador") { AfinadorScreen() }
     }
 }
@@ -214,9 +230,82 @@ fun TablaturasScreen() {
 }
 
 @Composable
-fun MetronomoScreen() {
-    Text(text = "Tela de Metrônomo", modifier = Modifier.fillMaxSize())
+fun MetronomoScreen(context: Context) {
+    var isPlaying by remember { mutableStateOf(false) }
+    var bpm by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    // Inicializa o MediaPlayer apenas uma vez
+    val mediaPlayer = remember { MediaPlayer.create(context, R.raw.metronomo_som) }
+
+    // Função para calcular o intervalo de tempo com base no BPM
+    fun bpmToDelay(bpm: Int): Long {
+        return (60000 / bpm).toLong() // 60000ms = 1 minuto
+    }
+
+    // Função para tocar o som no ritmo do BPM
+    fun startMetronome(bpm: Int) {
+        scope.launch {
+            while (isPlaying) {
+                mediaPlayer.start()
+                delay(bpmToDelay(bpm)) // Pausa até o próximo "click"
+                mediaPlayer.pause()     // Pausa logo após o toque
+                mediaPlayer.seekTo(0)   // Reinicia o som para o início
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = if (isPlaying) "Metrônomo / Reproduzindo" else "Metrônomo / Pausado",
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Campo de texto para o BPM
+        TextField(
+            value = bpm,
+            onValueChange = { bpm = it },
+            label = { Text("Digite o BPM") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botão de Reproduzir/Pausar
+        Button(onClick = {
+            if (bpm.isNotEmpty() && bpm.toIntOrNull() != null) {
+                isPlaying = !isPlaying
+                if (isPlaying) {
+                    startMetronome(bpm.toInt())
+                } else {
+                    mediaPlayer.pause() // Pausa quando o metrônomo é interrompido
+                }
+            }
+        }) {
+            Text(text = if (isPlaying) "Pausar" else "Reproduzir")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (isPlaying) {
+            Text(text = "Tocando a $bpm BPM", fontSize = 18.sp)
+        }
+    }
+
+    // Limpeza do MediaPlayer quando o Composable é removido da tela
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayer.release()
+        }
+    }
 }
+
 
 @Composable
 fun AfinadorScreen() {
