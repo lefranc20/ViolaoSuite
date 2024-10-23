@@ -26,9 +26,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -386,5 +388,59 @@ fun MetronomoScreen(context: Context) {
 
 @Composable
 fun AfinadorScreen() {
-    Text(text = "Tela de Afinador", modifier = Modifier.fillMaxSize())
+    var afinadorEstado by remember { mutableStateOf("Parado") }
+    var ouvindo by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(Color(0xFFEFE6FF)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Título que reflete o estado atual do afinador
+        Text(
+            text = "Afinador / $afinadorEstado",
+            color = Color(0xFFDACDEB),
+            fontSize = 16.sp,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Icone do afinador (o visual do afinador em semicírculo)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(200.dp)
+        ) {
+            // Semi-círculo de afinação
+            Image(
+                painter = painterResource(id = R.drawable.img_afinador), // Coloque a imagem do semicírculo de afinação
+                contentDescription = "Semicírculo de Afinação",
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // Ícone de microfone ao centro
+            Icon(
+                painter = painterResource(id = R.drawable.img_microfone), // Substitua pelo seu ícone de microfone
+                contentDescription = "Microfone",
+                modifier = Modifier
+                    .size(80.dp)
+                    .clickable {
+                        ouvindo = !ouvindo
+                        afinadorEstado = if (ouvindo) "Escutando" else "Parado"
+                    }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Texto de instrução que muda conforme o estado
+        Text(
+            text = if (ouvindo) "Ouvindo... pressione o botão novamente para parar." else "Pressione o botão e toque as notas do seu instrumento para verificar o afinamento.",
+            color = Color.Black,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 32.dp),
+            textAlign = TextAlign.Center
+        )
+    }
 }
