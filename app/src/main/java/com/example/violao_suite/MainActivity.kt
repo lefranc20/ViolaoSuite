@@ -28,7 +28,6 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -414,14 +413,14 @@ fun AfinadorScreen() {
         ) {
             // Semi-círculo de afinação
             Image(
-                painter = painterResource(id = R.drawable.img_afinador), // Coloque a imagem do semicírculo de afinação
+                painter = painterResource(id = R.drawable.img_afinador),
                 contentDescription = "Semicírculo de Afinação",
                 modifier = Modifier.fillMaxSize()
             )
 
             // Ícone de microfone ao centro
             Icon(
-                painter = painterResource(id = R.drawable.img_microfone), // Substitua pelo seu ícone de microfone
+                painter = painterResource(id = R.drawable.img_microfone),
                 contentDescription = "Microfone",
                 modifier = Modifier
                     .size(80.dp)
