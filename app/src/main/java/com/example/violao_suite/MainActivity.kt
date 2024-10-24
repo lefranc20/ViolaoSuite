@@ -28,7 +28,9 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -136,16 +138,24 @@ fun BottomNavigationBar(navController: NavHostController) {
 @Composable
 fun NavigationHost(navController: NavHostController) {
     NavHost(navController, startDestination = "acordes") {
+
+        // 1 - Acordes
         composable("acordes") { AcordesScreen(navController) }
         composable("acorde_detalhe/{acorde}") { backStackEntry ->
             val acorde = backStackEntry.arguments?.getString("acorde")
             AcordeDetalheScreen(acorde)
         }
+
+        // 2 - Tablaturas
         composable("tablaturas") { TablaturasScreen() }
+
+        // 3 - Metronomo
         composable("metronomo") {
             val context = LocalContext.current
             MetronomoScreen(context)
         }
+
+        // 4 - Afinador
         composable("afinador") { AfinadorScreen() }
     }
 }
@@ -165,7 +175,7 @@ fun AcordesScreen(navController: NavHostController) {
         Text(
             text = "Lista de Acordes",
             modifier = Modifier.padding(16.dp),
-            fontSize = 20.sp
+            fontSize = 16.sp
         )
 
         LazyVerticalGrid(
@@ -185,7 +195,7 @@ fun AcordesScreen(navController: NavHostController) {
                     Image(
                         painter = painterResource(id = acorde.second),
                         contentDescription = acorde.first,
-                        modifier = Modifier.size(64.dp)
+                        modifier = Modifier.size(96.dp)
                     )
                     Text(
                         text = acorde.first,
@@ -237,8 +247,8 @@ fun TablaturasScreen() {
         Text(
             text = "Lista de Tablaturas",
             modifier = Modifier.padding(16.dp),
-            fontSize = 20.sp,
-            color = Color.White
+            fontSize = 16.sp,
+            color = Color.Black
         )
 
         LazyVerticalGrid(
@@ -253,13 +263,13 @@ fun TablaturasScreen() {
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable {
-                            // Aqui você pode adicionar a lógica para abrir detalhes da tablatura
+
                         }
                 ) {
                     Image(
                         painter = painterResource(id = tablatura.second),
                         contentDescription = tablatura.first,
-                        modifier = Modifier.size(80.dp)
+                        modifier = Modifier.size(96.dp)
                     )
                     Text(
                         text = tablatura.first,
@@ -281,7 +291,7 @@ fun TablaturasScreen() {
                 .padding(horizontal = 8.dp, vertical = 12.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_search), // Substitua com seu ícone de pesquisa
+                painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "Pesquisar",
                 tint = Color(0xFFDACDEB),
                 modifier = Modifier.size(24.dp)
@@ -294,7 +304,7 @@ fun TablaturasScreen() {
                 modifier = Modifier.weight(1f)
             )
             Icon(
-                painter = painterResource(id = R.drawable.ic_add), // Substitua com seu ícone de adicionar
+                painter = painterResource(id = R.drawable.ic_add),
                 contentDescription = "Adicionar Tablatura",
                 tint = Color(0xFFDACDEB),
                 modifier = Modifier
@@ -350,6 +360,7 @@ fun MetronomoScreen(context: Context) {
             value = bpm,
             onValueChange = { bpm = it },
             label = { Text("Digite o BPM") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -393,15 +404,14 @@ fun AfinadorScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(0xFFEFE6FF)),
+            .background(Color(0xFFFFFFFF)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         // Título que reflete o estado atual do afinador
         Text(
             text = "Afinador / $afinadorEstado",
-            color = Color(0xFFDACDEB),
+            // color = Color(0xFF000000),
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
