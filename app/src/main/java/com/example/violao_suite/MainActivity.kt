@@ -1,10 +1,12 @@
-package com.example.violao_suite
+package com.app.violao_suite
+
+//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.*
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.material.*
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,24 +23,23 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-
-
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/* Importações não utilizadas ainda:
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.violao_suite.ui.theme.ViolaoSuiteTheme
-
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
+*/
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
