@@ -1,20 +1,9 @@
-package com.app.violao_suite
+package com.example.violao_suite
 
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.*
-
-<<<<<<< HEAD
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
-=======
-//noinspection UsingMaterialAndMaterial3Libraries
-
 
 // import androidx.compose.runtime.*
 
->>>>>>> 82edaf1 (Remoção de Erros e Typos)
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
@@ -64,33 +53,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-<<<<<<< HEAD
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.compose.ui.platform.LocalContext
-import android.content.Context
-import android.media.MediaPlayer
-import androidx.compose.foundation.background
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
-/* Importações não utilizadas ainda:
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.violao_suite.ui.theme.ViolaoSuiteTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-*/
-=======
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -105,7 +67,6 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
->>>>>>> 82edaf1 (Remoção de Erros e Typos)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
