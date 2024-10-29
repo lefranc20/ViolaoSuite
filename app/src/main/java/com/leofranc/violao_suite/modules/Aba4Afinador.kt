@@ -1,4 +1,4 @@
-package com.example.violao_suite.modules
+package com.leofranc.violao_suite.modules
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.violao_suite.R
+import com.leofranc.violao_suite.R
 
 @Composable
 fun AfinadorScreen() {

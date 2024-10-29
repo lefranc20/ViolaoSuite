@@ -1,4 +1,4 @@
-package com.example.violao_suite.modules
+package com.leofranc.violao_suite.modules
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
-import com.example.violao_suite.R
+import com.leofranc.violao_suite.R
 
 @Composable
 fun TablaturasScreen() {

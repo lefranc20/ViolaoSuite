@@ -1,4 +1,4 @@
-package com.example.violao_suite.modules
+package com.leofranc.violao_suite.modules
 
 import android.content.Context
 import android.media.MediaPlayer
@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.violao_suite.R
+import com.leofranc.violao_suite.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

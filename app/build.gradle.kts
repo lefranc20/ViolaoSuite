@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.violao_suite"
+    namespace = "com.leofranc.violao_suite"
     compileSdk = 34
 
     defaultConfig {
@@ -63,8 +63,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
     implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation ("androidx.navigation:navigation-compose:2.7.1") // Certifique-se de estar usando a última versão
+
+    // Para o json dos acordes
+    implementation ("com.google.code.gson:gson:2.8.8")
 
 
     // Dependência para navegação com Compose

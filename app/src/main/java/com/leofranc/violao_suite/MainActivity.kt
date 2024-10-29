@@ -1,22 +1,4 @@
-package com.example.violao_suite
-
-// Importação de pacotes contendo as funções das abas em module
-import com.example.violao_suite.modules.AcordeDetalheScreen
-import com.example.violao_suite.modules.AcordesScreen
-import com.example.violao_suite.modules.AfinadorScreen
-import com.example.violao_suite.modules.MetronomoScreen
-import com.example.violao_suite.modules.TablaturasScreen
-
-// Importando os pacotes padrões
-
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.BottomNavigation
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.BottomNavigationItem
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Scaffold
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Text
+package com.leofranc.violao_suite
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -24,6 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,10 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
+import com.leofranc.violao_suite.modules.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,56 +52,39 @@ fun currentRoute(navController: NavHostController): String? {
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf("tablaturas", "acordes", "metronomo", "afinador")
     val currentRoute = currentRoute(navController)
+
     BottomNavigation(
         backgroundColor = Color(0xFF141218),
     ) {
         items.forEach { screen ->
             val isSelected = currentRoute == screen
+            val iconId = when (screen) {
+                "tablaturas" -> if (isSelected) R.drawable.ic_tablaturas_selecionado else R.drawable.ic_tablaturas
+                "acordes" -> if (isSelected) R.drawable.ic_acordes_selecionado else R.drawable.ic_acordes
+                "metronomo" -> if (isSelected) R.drawable.ic_metronomo_selecionado else R.drawable.ic_metronomo
+                "afinador" -> if (isSelected) R.drawable.ic_afinador_selecionado else R.drawable.ic_afinador
+                else -> R.drawable.ic_launcher_foreground
+            }
+
             BottomNavigationItem(
                 icon = {
-                    when (screen) {
-                        "tablaturas" -> Image(
-                            painter = painterResource(
-                                id = if (isSelected) R.drawable.ic_tablaturas_selecionado else R.drawable.ic_tablaturas
-                            ),
-                            contentDescription = "Tablaturas",
-                            modifier = Modifier.size(32.dp)
-                        )
-                        "acordes" -> Image(
-                            painter = painterResource(
-                                id = if (isSelected) R.drawable.ic_acordes_selecionado else R.drawable.ic_acordes
-                            ),
-                            contentDescription = "Acordes",
-                            modifier = Modifier.size(32.dp)
-                        )
-                        "metronomo" -> Image(
-                            painter = painterResource(
-                                id = if (isSelected) R.drawable.ic_metronomo_selecionado else R.drawable.ic_metronomo
-                            ),
-                            contentDescription = "Metronomo",
-                            modifier = Modifier.size(32.dp)
-                        )
-                        "afinador" -> Image(
-                            painter = painterResource(
-                                id = if (isSelected) R.drawable.ic_afinador_selecionado else R.drawable.ic_afinador
-                            ),
-                            contentDescription = "Afinador",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    Image(
+                        painter = painterResource(id = iconId),
+                        contentDescription = screen,
+                        modifier = Modifier.size(32.dp)
+                    )
                 },
                 label = {
                     Text(
                         text = screen.replaceFirstChar { it.uppercase() },
-                        fontSize = 11.sp,
+                        fontSize = 11.sp
                     )
                 },
                 selected = isSelected,
                 selectedContentColor = Color(0xFFD0BCFE),
                 unselectedContentColor = Color(0xFFCAC4D0),
                 onClick = {
-                    if (screen == "acordes" && currentRoute == "acorde_detalhe") {
-                        // Se já estiver no acorde detalhado, voltar para a lista de acordes
+                    if (screen == "acordes" && currentRoute == "acorde_detalhe/{acordeNome}") {
                         navController.popBackStack("acordes", inclusive = false)
                     } else {
                         navController.navigate(screen) {
@@ -137,30 +104,22 @@ fun BottomNavigationBar(navController: NavHostController) {
 @Composable
 fun NavigationHost(navController: NavHostController) {
     NavHost(navController, startDestination = "acordes") {
-
-        // 1 - Acordes
         composable("acordes") { AcordesScreen(navController) }
-        composable("acorde_detalhe/{acorde}") { backStackEntry ->
-            val acorde = backStackEntry.arguments?.getString("acorde")
-            AcordeDetalheScreen(acorde)
-        }
 
-        // 2 - Tablaturas
-        composable("tablaturas") { TablaturasScreen() }
-
-        // 3 - Metronomo
-        composable("metronomo") {
+        composable("acorde_detalhe/{acordeNome}") { backStackEntry ->
             val context = LocalContext.current
-            MetronomoScreen(context)
+            val acordeNome = backStackEntry.arguments?.getString("acordeNome") ?: "Indefinido"
+            val resourceID = obterImagemResourceId(context, acordeNome)
+
+            AcordeDetalheScreen(
+                resourceID = resourceID,
+                nomeAcorde = acordeNome,
+                onVoltarClick = { navController.popBackStack() }
+            )
         }
 
-        // 4 - Afinador
+        composable("tablaturas") { TablaturasScreen() }
+        composable("metronomo") { MetronomoScreen(LocalContext.current) }
         composable("afinador") { AfinadorScreen() }
     }
 }
-
-
-
-
-
-

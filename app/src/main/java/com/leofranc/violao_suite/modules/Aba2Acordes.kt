@@ -1,100 +1,100 @@
-package com.example.violao_suite.modules
+package com.leofranc.violao_suite.modules
 
+import android.annotation.SuppressLint
+import android.content.Context
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.violao_suite.R
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.leofranc.violao_suite.R
+import java.io.InputStreamReader
+
+data class Acorde(val nome: String, val imagem: String)
+
+fun carregarAcordes(context: Context): List<Acorde> {
+    return try {
+        val inputStream = context.assets.open("acordes.json")
+        val reader = InputStreamReader(inputStream)
+        val acordeListType = object : TypeToken<List<Acorde>>() {}.type
+        Gson().fromJson(reader, acordeListType)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        emptyList()
+    }
+}
+
+@SuppressLint("DiscouragedApi")
+@DrawableRes
+fun obterImagemResourceId(context: Context, nomeImagem: String): Int {
+    val resourceId = context.resources.getIdentifier(nomeImagem, "drawable", context.packageName)
+    return if (resourceId != 0) resourceId else R.drawable.ic_launcher_foreground
+}
 
 @Composable
 fun AcordesScreen(navController: NavHostController) {
-    val acordes = listOf(
-        Pair("A menor", R.drawable.img_am),
-        Pair("Em", R.drawable.img_em),
-        Pair("C maior", R.drawable.img_c),
-        Pair("D maior", R.drawable.img_d),
-        Pair("D7", R.drawable.img_d7),
-        Pair("D menor", R.drawable.img_dm)
-    )
+    val context = LocalContext.current
+    val acordes = remember { carregarAcordes(context) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = "Lista de Acordes",
-            modifier = Modifier.padding(16.dp),
-            fontSize = 16.sp
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(acordes) { acorde ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            navController.navigate("acorde_detalhe/${acorde.first}")
-                        }
-                ) {
-                    Image(
-                        painter = painterResource(id = acorde.second),
-                        contentDescription = acorde.first,
-                        modifier = Modifier.size(96.dp)
-                    )
-                    Text(
-                        text = acorde.first,
-                        fontSize = 14.sp
-                    )
-                }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(acordes) { acorde ->
+            val imagemResId = obterImagemResourceId(context, acorde.imagem)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { navController.navigate("acorde_detalhe/${acorde.imagem}") }
+            ) {
+                Image(
+                    painter = painterResource(id = imagemResId),
+                    contentDescription = acorde.nome,
+                    modifier = Modifier.size(96.dp)
+                )
+                Text(text = acorde.nome, fontSize = 14.sp)
             }
         }
     }
 }
 
 @Composable
-fun AcordeDetalheScreen(acorde: String?) {
+fun AcordeDetalheScreen(resourceID: Int, nomeAcorde: String, onVoltarClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = when (acorde) {
-                "A menor" -> R.drawable.img_am
-                "Em" -> R.drawable.img_em
-                "C maior" -> R.drawable.img_c
-                "D maior" -> R.drawable.img_d
-                "D7" -> R.drawable.img_d7
-                "D menor" -> R.drawable.img_dm
-                else -> R.drawable.ic_launcher_foreground // Fallback para evitar crashes
-            }),
-            contentDescription = acorde,
-            modifier = Modifier.size(256.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = acorde ?: "Acorde Desconhecido",
-            fontSize = 24.sp
-        )
+        if (resourceID != 0) {
+            Image(
+                painter = painterResource(id = resourceID),
+                contentDescription = "Imagem do Acorde",
+                modifier = Modifier.size(200.dp)
+            )
+        } else {
+            Text("Imagem não disponível", color = Color.Red)
+        }
+        Text(text = nomeAcorde, modifier = Modifier.padding(top = 16.dp))
+        Button(onClick = onVoltarClick, modifier = Modifier.padding(top = 16.dp)) {
+            Text("Voltar")
+        }
     }
 }
