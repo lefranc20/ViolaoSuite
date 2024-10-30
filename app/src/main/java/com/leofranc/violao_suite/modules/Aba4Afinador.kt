@@ -65,9 +65,11 @@ private suspend fun detectFrequency(onFrequencyDetected: (Double) -> Unit) {
         AudioFormat.CHANNEL_IN_MONO,
         AudioFormat.ENCODING_PCM_16BIT
     )
+    // Inicializa o audioRecord como nulo para ser acessado em toda a função
+    val audioRecord: AudioRecord? = null
 
     try {
-        val audioRecord = AudioRecord(
+        @Suppress("NAME_SHADOWING") val audioRecord = AudioRecord(
             MediaRecorder.AudioSource.MIC,
             44100,
             AudioFormat.CHANNEL_IN_MONO,
@@ -86,10 +88,13 @@ private suspend fun detectFrequency(onFrequencyDetected: (Double) -> Unit) {
             // Delay para evitar travamento, ajustável conforme necessário
             delay(100)
         }
-        audioRecord.stop()
-        audioRecord.release()
+
     } catch (e: SecurityException) {
         // Lida com a exceção caso a permissão seja negada
+        onFrequencyDetected(-1.0) // Envia um valor indicando que houve erro
+    } finally {
+        audioRecord?.stop()
+        audioRecord?.release()
     }
 }
 
