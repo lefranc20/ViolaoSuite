@@ -103,7 +103,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun NavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "acordes") {
+    NavHost(navController, startDestination = "tablaturas") {
         composable("acordes") { AcordesScreen(navController) }
 
         composable("acorde_detalhe/{acordeNome}") { backStackEntry ->
