@@ -104,6 +104,12 @@ fun BottomNavigationBar(navController: NavHostController) {
 @Composable
 fun NavigationHost(navController: NavHostController) {
     NavHost(navController, startDestination = "tablaturas") {
+        composable("tablaturas") { navBackStackEntry ->
+            TablaturasScreen(onTablaturaClick = { tablatura ->
+                // Navegue para a tela de edição de tablatura com o ID da tablatura
+                navController.navigate("editar_tablatura/${tablatura.id}")
+            })
+        }
         composable("acordes") { AcordesScreen(navController) }
 
         composable("acorde_detalhe/{acordeNome}") { backStackEntry ->
@@ -118,7 +124,6 @@ fun NavigationHost(navController: NavHostController) {
             )
         }
 
-        composable("tablaturas") { TablaturasScreen() }
         composable("metronomo") { MetronomoScreen(LocalContext.current) }
         composable("afinador") { AfinadorScreen() }
     }

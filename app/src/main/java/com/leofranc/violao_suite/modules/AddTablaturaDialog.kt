@@ -15,16 +15,26 @@ import com.leofranc.violao_suite.data.model.Secao
 import com.leofranc.violao_suite.data.model.TablaturaData
 
 @Composable
-fun AddTablaturaDialog(
-    onDismiss: () -> Unit,
-    onSave: (TablaturaData) -> Unit
-) {
+fun AddTablaturaDialog(onSave: (TablaturaData) -> Unit) {
+    // Variáveis para os campos do diálogo
     var titulo by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
-    var secoes by remember { mutableStateOf(emptyList<Secao>()) }
+    val secoes = remember { mutableStateOf(mutableListOf<Secao>()) } // Inicializa como MutableList
 
+    // Função para salvar a nova tablatura
+    fun salvarTablatura() {
+        val novaTablatura = TablaturaData(
+            id = System.currentTimeMillis().toString(), // Gera um ID único
+            titulo = titulo,
+            descricao = descricao, // Inclui a descrição
+            secoes = secoes.value // Usa MutableList
+        )
+        onSave(novaTablatura) // Passa a nova tablatura para ser salva
+    }
+
+    // Layout do diálogo para inserir título, descrição, etc.
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { /* Código para fechar o diálogo */ },
         title = { Text("Adicionar Nova Tablatura") },
         text = {
             Column {
@@ -39,36 +49,16 @@ fun AddTablaturaDialog(
                     onValueChange = { descricao = it },
                     label = { Text("Descrição") }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Adicionando uma seção inicial com notas vazias para a nova tablatura
-                Button(onClick = {
-                    val novaSecao = Secao(
-                        posicao = secoes.size + 1,
-                        notas = List(6) { Nota(corda = it + 1, casa = -1) }
-                    )
-                    secoes = secoes + novaSecao
-                }) {
-                    Text("Adicionar Seção")
-                }
+                // Outros campos, como adicionar seções ou notas
             }
         },
         confirmButton = {
-            Button(onClick = {
-                val newTablatura = TablaturaData(
-                    id = System.currentTimeMillis().toString(), // Gera um ID único com base no tempo
-                    titulo = titulo,
-                    descricao = descricao,
-                    secoes = secoes
-                )
-                onSave(newTablatura)
-                onDismiss()
-            }) {
+            Button(onClick = { salvarTablatura() }) {
                 Text("Salvar")
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(onClick = { /* Código para fechar o diálogo */ }) {
                 Text("Cancelar")
             }
         }
