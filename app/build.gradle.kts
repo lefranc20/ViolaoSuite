@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt") // Adicione esta linha para habilitar o kapt
     id("kotlin-android")
-    id("com.dagger.hilt.android.plugin") // Plugin do Hilt
+    id("kotlin-kapt") // Adicione esta linha para habilitar o kapt
+    id("com.google.dagger.hilt.android") version "2.44" apply true // Defina explicitamente a versão
 }
 
 android {

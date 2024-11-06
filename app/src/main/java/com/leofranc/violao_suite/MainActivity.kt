@@ -31,7 +31,7 @@ import androidx.navigation.compose.*
 import com.leofranc.violao_suite.features.acordes.*
 import com.leofranc.violao_suite.features.metronomo.*
 import com.leofranc.violao_suite.features.afinador.*
-import com.leofranc.violao_suite.features.tablaturas.TelaTablaturas
+import com.leofranc.violao_suite.features.tablaturas.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +67,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     BottomNavigation(
         backgroundColor = Color(0xFF141218),
-    ) {
+    ) { // Imagens, e tratativa caso elas estejam selecionadas ou não
         items.forEach { screen ->
             val isSelected = currentRoute == screen
             val iconId = when (screen) {
