@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt") // Adicione esta linha para habilitar o kapt
+    id("kotlin-android")
+    id("com.dagger.hilt.android.plugin") // Plugin do Hilt
 }
 
 android {
@@ -8,7 +11,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.violao_suite"
+        applicationId = "com.leofranc.violao_suite"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -47,10 +50,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 dependencies {
-    // Compose UI e Material
+    // Dependências do Compose UI e Material Design 3
     implementation("androidx.compose.material3:material3:1.1.0")
     implementation("androidx.compose.ui:ui:1.4.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
@@ -58,24 +62,22 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.compose.material:material:1.4.0")
 
-    implementation("androidx.compose.material3:material3:1.1.0")
-    implementation("androidx.compose.ui:ui:1.4.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation ("androidx.navigation:navigation-compose:2.7.1") // Certifique-se de estar usando a última versão
-
-    // Para o json dos acordes
-    implementation ("com.google.code.gson:gson:2.8.8")
-
-
     // Dependência para navegação com Compose
-    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("androidx.navigation:navigation-compose:2.7.1")
+
+    // Para o JSON dos acordes
+    implementation("com.google.code.gson:gson:2.8.8")
+
+    // Dependências do Room Database
+    implementation("androidx.room:room-runtime:2.5.0")
+    implementation("androidx.room:room-ktx:2.5.0")
+    kapt("androidx.room:room-compiler:2.5.0")
+    implementation ("com.google.dagger:hilt-android:2.44") // Substitua pela versão mais recente
+    kapt ("com.google.dagger:hilt-compiler:2.44")
 
     // Dependências adicionais
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -90,4 +92,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }

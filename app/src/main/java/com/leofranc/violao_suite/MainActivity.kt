@@ -3,6 +3,7 @@ package com.leofranc.violao_suite
 // Importação de bibliotecas gerais
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -35,6 +36,7 @@ import com.leofranc.violao_suite.features.tablaturas.TelaTablaturas
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "Aplicativo iniciado")
         setContent {
             App()
         }
@@ -113,7 +115,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun NavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "tablaturas") {
+    NavHost(navController, startDestination = "acordes") {
         composable("tablaturas") { TelaTablaturas() }
 
         composable("acordes") { TelaAcordes(navController) }
