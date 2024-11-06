@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -78,7 +80,7 @@ fun InsertTablaturaSection(tablaturaDao: TablaturaDao) {
                         try {
                             // Insere a nova tablatura no banco de dados
                             val novaTablatura = Tablatura(nome = nome, texto = texto)
-                            tablaturaDao.inserirTablatura(novaTablatura)
+                            tablaturaDao.insertTablatura(novaTablatura)
 
                             // Limpa os campos após a inserção (de volta na UI thread)
                             nome = ""
@@ -106,8 +108,35 @@ fun TablaturaListSection(tablaturaDao: TablaturaDao) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(tablaturas) { tablatura ->
                 Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                    Text(text = "Nome: ${tablatura.nome}")
-                    Text(text = "Conteúdo: ${tablatura.texto}")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        // Exibe o nome e o conteúdo da tablatura
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = "Nome: ${tablatura.nome}")
+                            Text(text = "Conteúdo: ${tablatura.texto}")
+                        }
+                        // Botão de exclusão
+                        IconButton(onClick = {
+                            // Executa a exclusão em uma thread secundária
+                            databaseWriteExecutor.execute {
+                                try {
+                                    tablaturaDao.deleteTablatura(tablatura)
+                                } catch (e: Exception) {
+                                    Log.e("TablaturaListSection", "Erro ao deletar tablatura: ${e.message}")
+                                }
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 }
             }

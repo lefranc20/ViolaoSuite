@@ -12,11 +12,11 @@ import com.leofranc.violao_suite.data.model.Tablatura
 @Dao
 interface TablaturaDao {
     @Insert
-    fun inserirTablatura(tablatura: Tablatura): Long
+    fun insertTablatura(tablatura: Tablatura): Long
 
     @Query("SELECT * FROM tablatura_table")
     fun getAllTablaturas(): Flow<List<Tablatura>>
 
     @Delete
-    fun deletarTablatura(tablatura: Tablatura): Int
+    fun deleteTablatura(tablatura: Tablatura): Int
 }
