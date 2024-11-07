@@ -2,6 +2,8 @@ package com.leofranc.violao_suite.data.database
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 /*
 Este arquivo fornece uma instância singleton do AppDatabase para o aplicativo inteiro,
@@ -11,6 +13,11 @@ evitando a criação de múltiplas instâncias do banco de dados, o que economiz
 object DatabaseProvider {
     @Volatile
     private var INSTANCE: AppDatabase? = null
+    val MIGRATION_3_1 = object : Migration(3, 1) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+        }
+    }
 
     fun getDatabase(context: Context): AppDatabase {
         return INSTANCE ?: synchronized(this) {
@@ -19,6 +26,7 @@ object DatabaseProvider {
                 AppDatabase::class.java,
                 "app_database"
             ).build()
+
             INSTANCE = instance
             instance
         }
