@@ -1,23 +1,25 @@
 package com.leofranc.violao_suite
 
-// Importação de bibliotecas gerais
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.*
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
-//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigationItem
-//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.FabPosition
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -27,30 +29,30 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 
-// Importando arquivos do projeto
-import com.leofranc.violao_suite.features.acordes.*
-import com.leofranc.violao_suite.features.metronomo.*
-import com.leofranc.violao_suite.features.afinador.*
-import com.leofranc.violao_suite.features.tablaturas.*
+
+// Importando telas do projeto
+import com.leofranc.violao_suite.features.acordes.TelaAcordes
+import com.leofranc.violao_suite.features.metronomo.TelaMetronomo
+import com.leofranc.violao_suite.features.afinador.TelaAfinador
+import com.leofranc.violao_suite.features.tablaturas.TelaTablaturas
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "Aplicativo iniciado")
         setContent {
-            App()
+            MainApp()
         }
     }
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun App() {
+fun MainApp() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
-    ) {
-        NavigationHost(navController)
+    ) { paddingValues ->
+        NavigationHost(navController, Modifier.padding(paddingValues))
     }
 }
 
@@ -62,47 +64,36 @@ fun currentRoute(navController: NavHostController): String? {
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf("tablaturas", "acordes", "metronomo", "afinador")
-    val currentRoute = currentRoute(navController)
+    val items = listOf(
+        BottomNavItem("tablaturas", R.drawable.ic_tablaturas, "Tablaturas"),
+        BottomNavItem("acordes", R.drawable.ic_acordes, "Acordes"),
+        BottomNavItem("metronomo", R.drawable.ic_metronomo, "Metrônomo"),
+        BottomNavItem("afinador", R.drawable.ic_afinador, "Afinador")
+    )
 
     BottomNavigation(
         backgroundColor = Color(0xFF141218),
-    ) { // Imagens, e tratativa caso elas estejam selecionadas ou não
-        items.forEach { screen ->
-            val isSelected = currentRoute == screen
-            val iconId = when (screen) {
-                "tablaturas" -> if (isSelected) R.drawable.ic_tablaturas_selecionado else R.drawable.ic_tablaturas
-                "acordes" -> if (isSelected) R.drawable.ic_acordes_selecionado else R.drawable.ic_acordes
-                "metronomo" -> if (isSelected) R.drawable.ic_metronomo_selecionado else R.drawable.ic_metronomo
-                "afinador" -> if (isSelected) R.drawable.ic_afinador_selecionado else R.drawable.ic_afinador
-                else -> R.drawable.ic_launcher_foreground
-            }
+        contentColor = Color.White
+    ) {
+        val currentRoute = currentRoute(navController)
 
+        items.forEach { item ->
             BottomNavigationItem(
                 icon = {
-                    Image(
-                        painter = painterResource(id = iconId),
-                        contentDescription = screen,
-                        modifier = Modifier.size(32.dp)
+                    Icon(
+                        painter = painterResource(id = item.icon),
+                        contentDescription = item.label,
+                        modifier = Modifier.size(32.dp) // Define o tamanho do ícone aqui
                     )
                 },
-                label = {
-                    Text(
-                        text = screen.replaceFirstChar { it.uppercase() },
-                        fontSize = 11.sp
-                    )
-                },
-                selected = isSelected,
+                label = { Text(text = item.label) },
+                selected = currentRoute == item.route,
                 selectedContentColor = Color(0xFFD0BCFE),
                 unselectedContentColor = Color(0xFFCAC4D0),
                 onClick = {
-                    if (screen == "acordes" && currentRoute == "acorde_detalhe/{acordeNome}") {
-                        navController.popBackStack("acordes", inclusive = false)
-                    } else {
-                        navController.navigate(screen) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
+                    if (currentRoute != item.route) {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -114,26 +105,15 @@ fun BottomNavigationBar(navController: NavHostController) {
 }
 
 @Composable
-fun NavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "acordes") {
+fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
+    NavHost(navController, startDestination = "tablaturas", modifier = modifier) {
         composable("tablaturas") { TelaTablaturas() }
-
         composable("acordes") { TelaAcordes(navController) }
-
-        composable("acorde_detalhe/{acordeNome}") { backStackEntry ->
-            val context = LocalContext.current
-            val acordeNome = backStackEntry.arguments?.getString("acordeNome") ?: "Indefinido"
-            val resourceID = obterImagemResourceId(context, acordeNome)
-
-            AcordeDetalheScreen(
-                resourceID = resourceID,
-                nomeAcorde = acordeNome,
-                onVoltarClick = { navController.popBackStack() }
-            )
-        }
-
         composable("metronomo") { TelaMetronomo(LocalContext.current) }
-
         composable("afinador") { TelaAfinador() }
     }
 }
+
+
+// Dados para os itens de navegação
+data class BottomNavItem(val route: String, val icon: Int, val label: String)

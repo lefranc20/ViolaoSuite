@@ -61,6 +61,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.compose.material:material:1.4.0")
+    implementation ("androidx.compose.material:material-icons-extended:<1.4.0>")
+
 
     // Dependência para navegação com Compose
     implementation("androidx.navigation:navigation-compose:2.7.1")
@@ -71,6 +73,8 @@ dependencies {
     // Dependências do Room Database
     implementation("androidx.room:room-runtime:2.5.0")
     implementation("androidx.room:room-ktx:2.5.0")
+    implementation(libs.androidx.constraintlayout.compose.android)
+    implementation(libs.androidx.espresso.core)
     kapt("androidx.room:room-compiler:2.5.0")
     implementation ("com.google.dagger:hilt-android:2.44") // Substitua pela versão mais recente
     kapt ("com.google.dagger:hilt-compiler:2.44")
