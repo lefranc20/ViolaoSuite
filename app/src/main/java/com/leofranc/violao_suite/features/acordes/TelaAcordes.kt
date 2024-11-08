@@ -70,7 +70,7 @@ fun TelaAcordes(navController: NavHostController) {
                     contentDescription = acorde.nome,
                     modifier = Modifier.size(96.dp)
                 )
-                Text(text = acorde.nome, fontSize = 14.sp)
+                Text(text = acorde.nome, fontSize = 14.sp, color= Color.White)
             }
         }
     }

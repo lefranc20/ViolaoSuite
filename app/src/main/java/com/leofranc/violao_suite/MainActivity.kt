@@ -4,37 +4,25 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.FabPosition
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-
-
-// Importando telas do projeto
 import com.leofranc.violao_suite.features.acordes.TelaAcordes
 import com.leofranc.violao_suite.features.metronomo.TelaMetronomo
 import com.leofranc.violao_suite.features.afinador.TelaAfinador
 import com.leofranc.violao_suite.features.tablaturas.TelaTablaturas
+import com.leofranc.violao_suite.ui.theme.ViolaoSuiteTheme
+import com.leofranc.violao_suite.ui.theme.CorAbaSelecionada
+import com.leofranc.violao_suite.ui.theme.CorAbaNaoSelecionada
+import com.leofranc.violao_suite.ui.theme.CorFundo
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,11 +36,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp() {
-    val navController = rememberNavController()
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
-    ) { paddingValues ->
-        NavigationHost(navController, Modifier.padding(paddingValues))
+    ViolaoSuiteTheme {  // Aplica o tema customizado
+        val navController = rememberNavController()
+        Scaffold(
+            bottomBar = { BottomNavigationBar(navController) }
+        ) { paddingValues ->
+            NavigationHost(navController, Modifier.padding(paddingValues))
+        }
     }
 }
 
@@ -72,7 +62,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     )
 
     BottomNavigation(
-        backgroundColor = Color(0xFF141218),
+        backgroundColor = CorFundo,
         contentColor = Color.White
     ) {
         val currentRoute = currentRoute(navController)
@@ -88,8 +78,8 @@ fun BottomNavigationBar(navController: NavHostController) {
                 },
                 label = { Text(text = item.label) },
                 selected = currentRoute == item.route,
-                selectedContentColor = Color(0xFFD0BCFE),
-                unselectedContentColor = Color(0xFFCAC4D0),
+                selectedContentColor = CorAbaSelecionada,
+                unselectedContentColor = CorAbaNaoSelecionada,
                 onClick = {
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {
@@ -113,7 +103,6 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
         composable("afinador") { TelaAfinador() }
     }
 }
-
 
 // Dados para os itens de navegação
 data class BottomNavItem(val route: String, val icon: Int, val label: String)

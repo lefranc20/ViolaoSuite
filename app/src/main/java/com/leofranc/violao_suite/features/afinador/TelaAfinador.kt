@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.delay
@@ -52,10 +53,10 @@ fun TelaAfinador() {
     }
 
     Column {
-        Text(text = "Frequência Detectada: $detectedFrequency Hz")
-        Text(text = "Nota mais próxima: $closestNote")
+        Text(text = "Frequência Detectada: $detectedFrequency Hz", color=Color.White)
+        Text(text = "Nota mais próxima: $closestNote", color= Color.White)
         if (!permissionGranted) {
-            Text(text = "Aguardando permissão para acessar o microfone...")
+            Text(text = "Aguardando permissão para acessar o microfone...", color= Color.White)
         }
     }
 }
