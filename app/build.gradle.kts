@@ -2,9 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-android")
-    id("kotlin-kapt") // Adicione esta linha para habilitar o kapt
-    id("com.google.dagger.hilt.android") version "2.44" apply true // Defina explicitamente a versão
+    id("kotlin-kapt") // Linha para habilitar o kapt
+    id("com.google.dagger.hilt.android") version "2.44" apply true // Define explicitamente a versão
 }
+
+val composeVersion = "1.4.0" // Talvez não seja necessário
 
 android {
     namespace = "com.leofranc.violao_suite"
@@ -15,7 +17,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "0.1.1"
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -81,6 +83,8 @@ dependencies {
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
     kapt("androidx.room:room-compiler:2.5.0")
     implementation ("com.google.dagger:hilt-android:2.44") // Substitua pela versão mais recente
     kapt ("com.google.dagger:hilt-compiler:2.44")
@@ -93,6 +97,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(files("libs/TarsosDSP-Android-2.4.jar"))
+
 
     // Testes e debug
     testImplementation(libs.junit)

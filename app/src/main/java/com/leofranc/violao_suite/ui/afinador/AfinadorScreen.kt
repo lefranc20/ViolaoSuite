@@ -1,113 +1,121 @@
 package com.leofranc.violao_suite.ui.afinador
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
-import android.media.AudioRecord
-import android.media.MediaRecorder
-import android.media.AudioFormat
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
-import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.delay
-import kotlin.math.abs
+import be.tarsos.dsp.AudioDispatcher
+import be.tarsos.dsp.io.android.AudioDispatcherFactory
+import be.tarsos.dsp.pitch.PitchDetectionHandler
+import be.tarsos.dsp.pitch.PitchProcessor
+import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AfinadorScreen() {
     val context = LocalContext.current
-    val stringFrequencies = listOf(82.41, 110.00, 146.83, 196.00, 246.94, 329.63)
-    var detectedFrequency by remember { mutableDoubleStateOf(0.0) }
-    var closestNote by remember { mutableStateOf("") }
-    var permissionGranted by remember { mutableStateOf(false) }
+    val isPermissionGranted = remember { mutableStateOf(false) }
 
-    // Solicitação de permissão
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        permissionGranted = isGranted
-    }
-
-    // Verifique a permissão e solicite-a se necessário
+    // Verifique e solicite permissão para gravação de áudio
     LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionGranted = true
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                REQUEST_CODE_RECORD_AUDIO
+            )
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            isPermissionGranted.value = true
         }
     }
 
-    // Somente inicia a detecção de frequência se a permissão for concedida
-    if (permissionGranted) {
-        LaunchedEffect(Unit) {
-            detectFrequency { frequency ->
-                detectedFrequency = frequency
-                closestNote = getClosestString(frequency, stringFrequencies)
+    if (isPermissionGranted.value) {
+        // Inicie o afinador se a permissão for concedida
+        AfinadorComponent()
+    } else {
+        Text("A permissão para gravação de áudio é necessária para o afinador.")
+    }
+}
+
+@Composable
+fun AfinadorComponent() {
+    val coroutineScope = rememberCoroutineScope()
+    var afinacaoEstado by remember { mutableStateOf("") }
+    var notaDetectada by remember { mutableStateOf("") }
+    val afinacaoPadrao = listOf(82.41 to "E", 110.0 to "A", 146.83 to "D", 196.0 to "G", 246.94 to "B", 329.63 to "E") // Notas padrão E A D G B E
+    val dispatcher: AudioDispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0)
+
+    val handler = PitchDetectionHandler { res, _ ->
+        val pitch = res.pitch
+        if (pitch > 0) {
+            val (frequenciaMaisProxima, nomeNota) = afinacaoPadrao.minByOrNull { Math.abs(it.first - pitch) } ?: (0.0 to "")
+            val diferenca = pitch - frequenciaMaisProxima
+            afinacaoEstado = when {
+                diferenca < -1.0 -> "Grave"
+                diferenca > 1.0 -> "Aguda"
+                else -> "Afinada"
             }
+            notaDetectada = nomeNota
         }
     }
 
-    Column {
-        Text(text = "Frequência Detectada: $detectedFrequency Hz", color=Color.White)
-        Text(text = "Nota mais próxima: $closestNote", color= Color.White)
-        if (!permissionGranted) {
-            Text(text = "Aguardando permissão para acessar o microfone...", color= Color.White)
+    LaunchedEffect(Unit) {
+        val processor = PitchProcessor(PitchEstimationAlgorithm.YIN, 22050f, 1024, handler)
+        dispatcher.addAudioProcessor(processor)
+        withContext(Dispatchers.IO) {
+            dispatcher.run()
         }
     }
-}
 
-private suspend fun detectFrequency(onFrequencyDetected: (Double) -> Unit) {
-    val bufferSize = AudioRecord.getMinBufferSize(
-        44100,
-        AudioFormat.CHANNEL_IN_MONO,
-        AudioFormat.ENCODING_PCM_16BIT
-    )
-    // Inicializa o audioRecord como nulo para ser acessado em toda a função
-    val audioRecord: AudioRecord? = null
-
-    try {
-        @Suppress("NAME_SHADOWING") val audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            44100,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT,
-            bufferSize
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = "Nota detectada: $notaDetectada",
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
         )
-
-        val buffer = ShortArray(bufferSize)
-        audioRecord.startRecording()
-
-        while (true) {
-            val readCount = audioRecord.read(buffer, 0, buffer.size)
-            val frequency = calculateFrequency(buffer, readCount)
-            onFrequencyDetected(frequency)
-
-            // Delay para evitar travamento, ajustável conforme necessário
-            delay(100)
-        }
-
-    } catch (e: SecurityException) {
-        // Lida com a exceção caso a permissão seja negada
-        onFrequencyDetected(-1.0) // Envia um valor indicando que houve erro
-    } finally {
-        audioRecord?.stop()
-        audioRecord?.release()
+        Text(
+            text = "Estado da afinação: $afinacaoEstado",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+        Icon(
+            imageVector = when (afinacaoEstado) {
+                "Grave" -> Icons.Default.ArrowDownward
+                "Aguda" -> Icons.Default.ArrowUpward
+                else -> Icons.Default.Check
+            },
+            contentDescription = "Estado da afinação",
+            tint = when (afinacaoEstado) {
+                "Grave" -> Color.Blue
+                "Aguda" -> Color.Red
+                else -> Color.Green
+            },
+            modifier = Modifier.size(48.dp)
+        )
     }
 }
 
-private fun calculateFrequency(buffer: ShortArray, readCount: Int): Double {
-    var zeroCrossings = 0
-    for (i in 0 until readCount - 1) {
-        if (buffer[i] * buffer[i + 1] < 0) zeroCrossings++
-    }
-    return zeroCrossings * 44100.0 / readCount
-}
-
-private fun getClosestString(frequency: Double, stringFrequencies: List<Double>): String {
-    return stringFrequencies.minByOrNull { abs(it - frequency) }?.let { "Nota para ${it}Hz" } ?: "Indefinido"
-}
+const val REQUEST_CODE_RECORD_AUDIO = 1001

@@ -9,5 +9,6 @@ allprojects {
     repositories {
         google() // Repositório Google para o Hilt
         mavenCentral()
+        maven("https://jitpack.io") // para o TarsosDSP
     }
 }
