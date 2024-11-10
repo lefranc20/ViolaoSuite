@@ -1,4 +1,4 @@
-package com.leofranc.violao_suite.features.acordes
+package com.leofranc.violao_suite.ui.acordes
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -48,7 +48,7 @@ fun obterImagemResourceId(context: Context, nomeImagem: String): Int {
 }
 
 @Composable
-fun TelaAcordes(navController: NavHostController) {
+fun AcordesScreen(navController: NavHostController) {
     val context = LocalContext.current
     val acordes = remember { carregarAcordes(context) }
 

@@ -1,4 +1,4 @@
-package com.leofranc.violao_suite.features.afinador
+package com.leofranc.violao_suite.ui.afinador
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -17,7 +17,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.abs
 
 @Composable
-fun TelaAfinador() {
+fun AfinadorScreen() {
     val context = LocalContext.current
     val stringFrequencies = listOf(82.41, 110.00, 146.83, 196.00, 246.94, 329.63)
     var detectedFrequency by remember { mutableDoubleStateOf(0.0) }

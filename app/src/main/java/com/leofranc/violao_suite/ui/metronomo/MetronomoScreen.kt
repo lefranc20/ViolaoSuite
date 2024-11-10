@@ -1,4 +1,4 @@
-package com.leofranc.violao_suite.features.metronomo
+package com.leofranc.violao_suite.ui.metronomo
 
 import android.content.Context
 import android.media.MediaPlayer
@@ -33,7 +33,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun TelaMetronomo(context: Context) {
+fun MetronomoScreen(context: Context) {
     var isPlaying by remember { mutableStateOf(false) }
     var bpm by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()

@@ -1,9 +1,9 @@
 package com.leofranc.violao_suite
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
@@ -14,34 +14,47 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
-import com.leofranc.violao_suite.features.acordes.TelaAcordes
-import com.leofranc.violao_suite.features.metronomo.TelaMetronomo
-import com.leofranc.violao_suite.features.afinador.TelaAfinador
-import com.leofranc.violao_suite.features.tablaturas.TelaTablaturas
+import androidx.navigation.navArgument
+import com.leofranc.violao_suite.data.AppDatabase
+import com.leofranc.violao_suite.repository.TablaturaRepository
+import com.leofranc.violao_suite.ui.acordes.AcordesScreen
+import com.leofranc.violao_suite.ui.metronomo.MetronomoScreen
+import com.leofranc.violao_suite.ui.afinador.AfinadorScreen
+import com.leofranc.violao_suite.ui.tablaturas.TablaturasScreen
+import com.leofranc.violao_suite.ui.tablaturas.TablaturaEditorScreen  // Importação adicionada
 import com.leofranc.violao_suite.ui.theme.ViolaoSuiteTheme
 import com.leofranc.violao_suite.ui.theme.CorAbaSelecionada
 import com.leofranc.violao_suite.ui.theme.CorAbaNaoSelecionada
 import com.leofranc.violao_suite.ui.theme.CorFundo
+import com.leofranc.violao_suite.viewmodel.TablaturaViewModel
+import com.leofranc.violao_suite.viewmodel.TablaturaViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
+    private val database by lazy { AppDatabase.getDatabase(this) }
+    private val repository by lazy { TablaturaRepository(database.tablaturaDao()) }
+    private val tablaturaViewModel: TablaturaViewModel by viewModels {
+        TablaturaViewModelFactory(repository)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MainActivity", "Aplicativo iniciado")
         setContent {
-            MainApp()
+            MainApp(tablaturaViewModel)
         }
     }
 }
 
 @Composable
-fun MainApp() {
+fun MainApp(tablaturaViewModel: TablaturaViewModel) {
     ViolaoSuiteTheme {  // Aplica o tema customizado
         val navController = rememberNavController()
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) }
         ) { paddingValues ->
-            NavigationHost(navController, Modifier.padding(paddingValues))
+            NavigationHost(navController, Modifier.padding(paddingValues), tablaturaViewModel)
         }
     }
 }
@@ -95,14 +108,35 @@ fun BottomNavigationBar(navController: NavHostController) {
 }
 
 @Composable
-fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
+fun NavigationHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    tablaturaViewModel: TablaturaViewModel
+) {
     NavHost(navController, startDestination = "tablaturas", modifier = modifier) {
-        composable("tablaturas") { TelaTablaturas() }
-        composable("acordes") { TelaAcordes(navController) }
-        composable("metronomo") { TelaMetronomo(LocalContext.current) }
-        composable("afinador") { TelaAfinador() }
+
+        composable("tablaturas") {
+            TablaturasScreen(navController = navController, viewModel = tablaturaViewModel)
+        }
+
+        composable(
+            route = "tablatura/{tablaturaId}",
+            arguments = listOf(navArgument("tablaturaId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val tablaturaId = backStackEntry.arguments?.getLong("tablaturaId") ?: 0L
+            TablaturaEditorScreen(
+                navController = navController,          // Corrige passando o navController
+                viewModel = tablaturaViewModel,
+                tablaturaId = tablaturaId
+            )
+        }
+
+        composable("acordes") { AcordesScreen(navController) }
+        composable("metronomo") { MetronomoScreen(LocalContext.current) }
+        composable("afinador") { AfinadorScreen() }
     }
 }
+
 
 // Dados para os itens de navegação
 data class BottomNavItem(val route: String, val icon: Int, val label: String)
