@@ -19,7 +19,6 @@ Thumbs.db
 # Arquivos temporários ou compilados
 /out/
 *.apk
-*.jar
 *.swp
 *.swo
 *.log
