@@ -6,7 +6,6 @@
     <!-- Permissão para gravação de áudio -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-
     <application
         android:enableOnBackInvokedCallback="true"
         android:allowBackup="true"

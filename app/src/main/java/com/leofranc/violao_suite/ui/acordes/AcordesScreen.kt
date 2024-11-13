@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -52,49 +52,39 @@ fun AcordesScreen(navController: NavHostController) {
     val context = LocalContext.current
     val acordes = remember { carregarAcordes(context) }
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(16.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(acordes) { acorde ->
-            val imagemResId = obterImagemResourceId(context, acorde.imagem)
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Lista de Acordes", style = TextStyle(fontSize = 20.sp, color = Color.White)) },
+                backgroundColor = Color(0xFF2A282E),  // Fundo com cor #2A282E
+                contentColor = Color.White             // Cor do texto branca
+            )
+        },
+        content = { paddingValues ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(16.dp),
                 modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { navController.navigate("acorde_detalhe/${acorde.imagem}") }
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                Image(
-                    painter = painterResource(id = imagemResId),
-                    contentDescription = acorde.nome,
-                    modifier = Modifier.size(96.dp)
-                )
-                Text(text = acorde.nome, fontSize = 14.sp, color= Color.White)
+                items(acordes) { acorde ->
+                    val imagemResId = obterImagemResourceId(context, acorde.imagem)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable { navController.navigate("acorde_detalhe/${acorde.imagem}") }
+                    ) {
+                        Image(
+                            painter = painterResource(id = imagemResId),
+                            contentDescription = acorde.nome,
+                            modifier = Modifier.size(96.dp)
+                        )
+                        Text(text = acorde.nome, fontSize = 14.sp, color = Color.White)
+                    }
+                }
             }
         }
-    }
-}
-
-@Composable
-fun AcordeDetalheScreen(resourceID: Int, nomeAcorde: String, onVoltarClick: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if (resourceID != 0) {
-            Image(
-                painter = painterResource(id = resourceID),
-                contentDescription = "Imagem do Acorde",
-                modifier = Modifier.size(200.dp)
-            )
-        } else {
-            Text("Imagem não disponível", color = Color.Red)
-        }
-        Text(text = nomeAcorde, modifier = Modifier.padding(top = 16.dp))
-        Button(onClick = onVoltarClick, modifier = Modifier.padding(top = 16.dp)) {
-            Text("Voltar")
-        }
-    }
+    )
 }

@@ -1,13 +1,15 @@
 package com.leofranc.violao_suite.ui.tablaturas
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -35,8 +37,9 @@ fun TablaturaEditorScreen(navController: NavController, viewModel: TablaturaView
     val posicoes by viewModel.posicoes.observeAsState(emptyList())
     var isEditing by remember { mutableStateOf(false) }
 
-    // ScrollState para o scroll horizontal
-    val horizontalScrollState = rememberScrollState()
+    // Detectar orientação
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     // Carrega a tablatura ao iniciar a tela para obter título e descrição
     LaunchedEffect(tablaturaId) {
@@ -124,22 +127,21 @@ fun TablaturaEditorScreen(navController: NavController, viewModel: TablaturaView
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Títulos das colunas com rolagem horizontal
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(horizontalScrollState),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
+                // Títulos das colunas
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(
-                        text = "Cordas",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        modifier = Modifier.width(60.dp),
-                        textAlign = TextAlign.Center
-                    )
-                    posicoes.forEachIndexed { index, _ ->
+                    item {
+                        Text(
+                            text = "Cordas",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            modifier = Modifier.width(60.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    items(posicoes.size) { index ->
                         Text(
                             text = "${index + 1}",
                             fontWeight = FontWeight.Bold,
@@ -151,45 +153,45 @@ fun TablaturaEditorScreen(navController: NavController, viewModel: TablaturaView
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Tabela de cordas e posições com rolagem horizontal
+                // Tabela de cordas e posições
                 val cordas = listOf("E", "B", "G", "D", "A", "E")
-                cordas.forEachIndexed { cordaIndex, corda ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(horizontalScrollState),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = corda,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                            modifier = Modifier.width(60.dp),
-                            textAlign = TextAlign.Center
-                        )
-
-                        posicoes.forEach { posicao ->
-                            val valor = when (cordaIndex) {
-                                0 -> posicao.corda1
-                                1 -> posicao.corda2
-                                2 -> posicao.corda3
-                                3 -> posicao.corda4
-                                4 -> posicao.corda5
-                                5 -> posicao.corda6
-                                else -> 0
+                LazyColumn {
+                    items(cordas.size) { cordaIndex ->
+                        LazyRow(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            item {
+                                // Nome da corda
+                                Text(
+                                    text = cordas[cordaIndex],
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    modifier = Modifier.width(60.dp),
+                                    textAlign = TextAlign.Center
+                                )
                             }
-
-                            PosicaoField(casa = valor) { novoValor ->
-                                val novaPosicao = when (cordaIndex) {
-                                    0 -> posicao.copy(corda1 = novoValor)
-                                    1 -> posicao.copy(corda2 = novoValor)
-                                    2 -> posicao.copy(corda3 = novoValor)
-                                    3 -> posicao.copy(corda4 = novoValor)
-                                    4 -> posicao.copy(corda5 = novoValor)
-                                    5 -> posicao.copy(corda6 = novoValor)
-                                    else -> posicao
+                            items(posicoes) { posicao ->
+                                val valor = when (cordaIndex) {
+                                    0 -> posicao.corda1
+                                    1 -> posicao.corda2
+                                    2 -> posicao.corda3
+                                    3 -> posicao.corda4
+                                    4 -> posicao.corda5
+                                    5 -> posicao.corda6
+                                    else -> 0
                                 }
-                                viewModel.atualizarPosicao(novaPosicao)
+                                PosicaoField(casa = valor) { novoValor ->
+                                    val novaPosicao = when (cordaIndex) {
+                                        0 -> posicao.copy(corda1 = novoValor)
+                                        1 -> posicao.copy(corda2 = novoValor)
+                                        2 -> posicao.copy(corda3 = novoValor)
+                                        3 -> posicao.copy(corda4 = novoValor)
+                                        4 -> posicao.copy(corda5 = novoValor)
+                                        5 -> posicao.copy(corda6 = novoValor)
+                                        else -> posicao
+                                    }
+                                    viewModel.atualizarPosicao(novaPosicao)
+                                }
                             }
                         }
                     }
