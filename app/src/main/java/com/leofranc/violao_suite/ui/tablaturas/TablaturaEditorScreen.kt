@@ -135,6 +135,7 @@ fun TablaturaEditorScreen(navController: NavController, viewModel: TablaturaView
                     Text(
                         text = "Cordas",
                         fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
                         modifier = Modifier.width(60.dp),
                         textAlign = TextAlign.Center
                     )
