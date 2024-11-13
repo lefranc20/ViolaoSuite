@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +35,10 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AfinadorScreen() {
     val context = LocalContext.current
-    val isPermissionGranted = remember { mutableStateOf(false) }
+    var isPermissionGranted by remember { mutableStateOf(false) }
+    var isDetecting by remember { mutableStateOf(false) }
 
-    // Verifique e solicite permissão para gravação de áudio
+    // Verifica e solicita permissão para gravação de áudio
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -44,7 +47,7 @@ fun AfinadorScreen() {
                 REQUEST_CODE_RECORD_AUDIO
             )
         } else {
-            isPermissionGranted.value = true
+            isPermissionGranted = true
         }
     }
 
@@ -56,8 +59,8 @@ fun AfinadorScreen() {
             )
         },
         content = {
-            if (isPermissionGranted.value) {
-                AfinadorComponent()
+            if (isPermissionGranted) {
+                AfinadorComponent(isDetecting = isDetecting, onToggleDetecting = { isDetecting = !isDetecting })
             } else {
                 Text(
                     text = "A permissão para gravação de áudio é necessária para o afinador.",
@@ -69,13 +72,14 @@ fun AfinadorScreen() {
 }
 
 @Composable
-fun AfinadorComponent() {
+fun AfinadorComponent(isDetecting: Boolean, onToggleDetecting: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     var afinacaoEstado by remember { mutableStateOf("") }
     var notaDetectada by remember { mutableStateOf("") }
-    val afinacaoPadrao = listOf(82.41 to "E", 110.0 to "A", 146.83 to "D", 196.0 to "G", 246.94 to "B", 329.63 to "E") // Notas padrão E A D G B E
-    val dispatcher: AudioDispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0)
+    val afinacaoPadrao = listOf(82.41 to "E", 110.0 to "A", 146.83 to "D", 196.0 to "G", 246.94 to "B", 329.63 to "E")
+    var dispatcher by remember { mutableStateOf<AudioDispatcher?>(null) }
 
+    // Handler para detecção de pitch
     val handler = PitchDetectionHandler { res, _ ->
         val pitch = res.pitch
         if (pitch > 0) {
@@ -90,11 +94,24 @@ fun AfinadorComponent() {
         }
     }
 
-    LaunchedEffect(Unit) {
-        val processor = PitchProcessor(PitchEstimationAlgorithm.YIN, 22050f, 1024, handler)
-        dispatcher.addAudioProcessor(processor)
-        withContext(Dispatchers.IO) {
-            dispatcher.run()
+    // Inicia ou para o dispatcher conforme o estado de detecção
+    LaunchedEffect(isDetecting) {
+        if (isDetecting) {
+            dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0).apply {
+                addAudioProcessor(PitchProcessor(PitchEstimationAlgorithm.YIN, 22050f, 1024, handler))
+            }
+            withContext(Dispatchers.IO) {
+                dispatcher?.run()
+            }
+        } else {
+            dispatcher?.stop()
+        }
+    }
+
+    // Para o dispatcher ao sair da aba
+    DisposableEffect(Unit) {
+        onDispose {
+            dispatcher?.stop()
         }
     }
 
@@ -127,6 +144,12 @@ fun AfinadorComponent() {
             },
             modifier = Modifier.size(48.dp)
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(onClick = onToggleDetecting) {
+            Text(if (isDetecting) "Parar" else "Iniciar")
+        }
     }
 }
 
