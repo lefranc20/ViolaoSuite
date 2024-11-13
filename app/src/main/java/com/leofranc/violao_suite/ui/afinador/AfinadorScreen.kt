@@ -1,10 +1,10 @@
 package com.leofranc.violao_suite.ui.afinador
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -30,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AfinadorScreen() {
     val context = LocalContext.current
@@ -48,12 +48,24 @@ fun AfinadorScreen() {
         }
     }
 
-    if (isPermissionGranted.value) {
-        // Inicie o afinador se a permissão for concedida
-        AfinadorComponent()
-    } else {
-        Text("A permissão para gravação de áudio é necessária para o afinador.")
-    }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Afinador", fontSize = 20.sp, color = Color.White) },
+                backgroundColor = Color(0xFF2A282E)
+            )
+        },
+        content = {
+            if (isPermissionGranted.value) {
+                AfinadorComponent()
+            } else {
+                Text(
+                    text = "A permissão para gravação de áudio é necessária para o afinador.",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+    )
 }
 
 @Composable
@@ -89,7 +101,7 @@ fun AfinadorComponent() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {
         Text(
             text = "Nota detectada: $notaDetectada",
