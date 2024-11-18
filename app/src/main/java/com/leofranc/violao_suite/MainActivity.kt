@@ -20,10 +20,12 @@ import androidx.navigation.navArgument
 import com.leofranc.violao_suite.data.AppDatabase
 import com.leofranc.violao_suite.repository.TablaturaRepository
 import com.leofranc.violao_suite.ui.acordes.AcordesScreen
+import com.leofranc.violao_suite.ui.acordes.AcordeDetalheScreen
+import com.leofranc.violao_suite.ui.acordes.obterImagemResourceId
 import com.leofranc.violao_suite.ui.metronomo.MetronomoScreen
 import com.leofranc.violao_suite.ui.afinador.AfinadorScreen
 import com.leofranc.violao_suite.ui.tablaturas.TablaturasScreen
-import com.leofranc.violao_suite.ui.tablaturas.TablaturaEditorScreen  // Importação adicionada
+import com.leofranc.violao_suite.ui.tablaturas.TablaturaEditorScreen
 import com.leofranc.violao_suite.ui.theme.ViolaoSuiteTheme
 import com.leofranc.violao_suite.ui.theme.CorAbaSelecionada
 import com.leofranc.violao_suite.ui.theme.CorAbaNaoSelecionada
@@ -86,7 +88,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                     Icon(
                         painter = painterResource(id = item.icon),
                         contentDescription = item.label,
-                        modifier = Modifier.size(32.dp) // Define o tamanho do ícone aqui
+                        modifier = Modifier.size(32.dp)
                     )
                 },
                 label = { Text(text = item.label) },
@@ -115,28 +117,60 @@ fun NavigationHost(
 ) {
     NavHost(navController, startDestination = "tablaturas", modifier = modifier) {
 
+        // Rota para a lista de tablaturas
         composable("tablaturas") {
             TablaturasScreen(navController = navController, viewModel = tablaturaViewModel)
         }
 
+        // Rota para o editor de tablaturas
         composable(
             route = "tablatura/{tablaturaId}",
             arguments = listOf(navArgument("tablaturaId") { type = NavType.LongType })
         ) { backStackEntry ->
             val tablaturaId = backStackEntry.arguments?.getLong("tablaturaId") ?: 0L
             TablaturaEditorScreen(
-                navController = navController,          // Corrige passando o navController
+                navController = navController,
                 viewModel = tablaturaViewModel,
                 tablaturaId = tablaturaId
             )
         }
 
-        composable("acordes") { AcordesScreen(navController) }
-        composable("metronomo") { MetronomoScreen(LocalContext.current) }
-        composable("afinador") { AfinadorScreen() }
+        // Rota para a lista de acordes
+        composable("acordes") {
+            AcordesScreen(navController = navController)
+        }
+
+        composable(
+            route = "acorde_detalhe/{nome}/{imagem}",
+            arguments = listOf(
+                navArgument("nome") { type = NavType.StringType },
+                navArgument("imagem") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val nomeAcorde = backStackEntry.arguments?.getString("nome") ?: ""
+            val imagem = backStackEntry.arguments?.getString("imagem") ?: ""
+            val resourceID = obterImagemResourceId(context = LocalContext.current, nomeImagem = imagem)
+
+            AcordeDetalheScreen(
+                navController = navController,
+                resourceID = resourceID,
+                nomeAcorde = nomeAcorde
+            )
+        }
+
+
+
+        // Rota para o metrônomo
+        composable("metronomo") {
+            MetronomoScreen(context = LocalContext.current)
+        }
+
+        // Rota para o afinador
+        composable("afinador") {
+            AfinadorScreen()
+        }
     }
 }
-
 
 // Dados para os itens de navegação
 data class BottomNavItem(val route: String, val icon: Int, val label: String)

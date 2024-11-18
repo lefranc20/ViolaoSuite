@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -74,7 +76,9 @@ fun AcordesScreen(navController: NavHostController) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .padding(8.dp)
-                            .clickable { navController.navigate("acorde_detalhe/${acorde.imagem}") }
+                            .clickable {
+                                navController.navigate("acorde_detalhe/${acorde.nome}/${acorde.imagem}")
+                            }
                     ) {
                         Image(
                             painter = painterResource(id = imagemResId),
