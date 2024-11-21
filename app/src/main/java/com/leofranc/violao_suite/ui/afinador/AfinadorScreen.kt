@@ -10,8 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -105,6 +103,7 @@ fun AfinadorComponent(isDetecting: Boolean, onToggleDetecting: () -> Unit) {
             }
         } else {
             dispatcher?.stop()
+            dispatcher = null
         }
     }
 
@@ -120,30 +119,39 @@ fun AfinadorComponent(isDetecting: Boolean, onToggleDetecting: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {
-        Text(
-            text = "Nota detectada: $notaDetectada",
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp
-        )
-        Text(
-            text = "Estado da afinação: $afinacaoEstado",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-        Icon(
-            imageVector = when (afinacaoEstado) {
-                "Grave" -> Icons.Default.ArrowDownward
-                "Aguda" -> Icons.Default.ArrowUpward
-                else -> Icons.Default.Check
-            },
-            contentDescription = "Estado da afinação",
-            tint = when (afinacaoEstado) {
-                "Grave" -> Color.Blue
-                "Aguda" -> Color.Red
-                else -> Color.Green
-            },
-            modifier = Modifier.size(48.dp)
-        )
+        if (isDetecting) {
+            Text(
+                text = "Nota detectada: $notaDetectada",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            )
+            Text(
+                text = "Estado da afinação: $afinacaoEstado",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+            Icon(
+                imageVector = when (afinacaoEstado) {
+                    "Grave" -> Icons.Default.ArrowDownward
+                    "Aguda" -> Icons.Default.ArrowUpward
+                    else -> Icons.Default.Check
+                },
+                contentDescription = "Estado da afinação",
+                tint = when (afinacaoEstado) {
+                    "Grave" -> Color.Blue
+                    "Aguda" -> Color.Red
+                    else -> Color.Green
+                },
+                modifier = Modifier.size(48.dp)
+            )
+        } else {
+            Text(
+                text = "Afinação Pausada",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = Color.Gray
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
