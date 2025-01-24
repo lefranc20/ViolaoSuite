@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+//noinspection UsingMaterialAndMaterial3Libraries,UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +40,7 @@ fun TablaturaEditorScreen(navController: NavController, viewModel: TablaturaView
 
     // Detectar orientação
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     // Carrega a tablatura ao iniciar a tela para obter título e descrição
     LaunchedEffect(tablaturaId) {
